@@ -1,4 +1,4 @@
-export const API_BASE_URL = import.env.VITE_API_URL;
+export const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -23,11 +23,15 @@ export const apiFetch = async (endpoint, options = {}) => {
     data = await response.json();
   } else {
     const text = await response.text();
-    throw new Error(`PROTOCOL_ERROR: Server returned non-JSON response (${response.status})`);
+    throw new Error(
+      `PROTOCOL_ERROR: Server returned non-JSON response (${response.status})`,
+    );
   }
 
   if (!response.ok) {
-    throw new Error(data?.message || data?.error || `An error occurred (${response.status})`);
+    throw new Error(
+      data?.message || data?.error || `An error occurred (${response.status})`,
+    );
   }
 
   return data;
@@ -72,8 +76,7 @@ export const meetingService = {
     apiFetch("/meetings", { method: "POST", body: JSON.stringify(data) }),
   updateMeeting: (id, data) =>
     apiFetch(`/meetings/${id}`, { method: "PUT", body: JSON.stringify(data) }),
-  deleteMeeting: (id) =>
-    apiFetch(`/meetings/${id}`, { method: "DELETE" }),
+  deleteMeeting: (id) => apiFetch(`/meetings/${id}`, { method: "DELETE" }),
 };
 
 export const studentService = {
