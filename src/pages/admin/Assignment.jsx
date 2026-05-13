@@ -81,7 +81,7 @@ export default function Assignment() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8 font-sans">
       {/* ... (rest of the header and mapping section remains same) */}
-      
+
       {/* HEADER */}
       <header className="mb-12 flex flex-col md:flex-row justify-between items-baseline gap-4 border-b border-border pb-6">
         <div>
@@ -89,7 +89,7 @@ export default function Assignment() {
             <span className="text-primary">Faculty Assignment </span>
           </h1>
           <p className="text-[10px] tracking-[0.3em] uppercase mt-2 text-muted-foreground font-bold">
-            CANDIDATE_FACULTY_LINKING • Encryption: SECURE_CHANNEL
+            Scholar-Faculty Linking • Encryption: SECURE_CHANNEL
           </p>
         </div>
         <Button
@@ -111,7 +111,7 @@ export default function Assignment() {
             <div className="flex items-center gap-2 mb-2">
               <Users className="h-4 w-4 text-primary" />
               <h3 className="text-[10px] tracking-[0.3em] uppercase font-bold text-muted-foreground">
-                Select_Candidate
+                Select Scholar
               </h3>
             </div>
             <div className="border border-border bg-card p-6 min-h-[200px] flex flex-col justify-between">
@@ -120,7 +120,9 @@ export default function Assignment() {
                 onChange={(e) => setSelectedStudent(e.target.value)}
                 className="w-full bg-transparent border-b border-border py-2 text-[11px] tracking-widest uppercase outline-none focus:border-primary transition-colors cursor-pointer mb-6"
               >
-                <option value="">-- SEARCH_CANDIDATE_REGISTRY --</option>
+                <option value="">
+                  -- SEARCH SCHOLAR BY REGISTER NUMBER --
+                </option>
                 {students.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.profiles?.name} ({s.register_number})
@@ -157,7 +159,7 @@ export default function Assignment() {
             <div className="flex items-center gap-2 mb-2">
               <UserCheck className="h-4 w-4 text-primary" />
               <h3 className="text-[10px] tracking-[0.3em] uppercase font-bold text-muted-foreground">
-                Select_Faculty
+                SELECT SUPERVISOR
               </h3>
             </div>
             <div className="border border-border bg-card p-6 min-h-[200px] flex flex-col justify-between">
@@ -166,7 +168,7 @@ export default function Assignment() {
                 onChange={(e) => setSelectedSupervisor(e.target.value)}
                 className="w-full bg-transparent border-b border-border py-2 text-[11px] tracking-widest uppercase outline-none focus:border-primary transition-colors cursor-pointer mb-6"
               >
-                <option value="">-- SELECT_AVAILABLE_SUPERVISOR --</option>
+                <option value="">-- SELECT SUPERVISOR --</option>
                 {supervisors.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.name}
@@ -180,7 +182,7 @@ export default function Assignment() {
                     Load Status
                   </p>
                   <p className="text-xs font-bold uppercase tracking-wider">
-                    FACULTY_NODE_READY
+                    FACULTY REGISTER IS READY
                   </p>
                 </div>
               )}

@@ -298,8 +298,7 @@ export default function Registry() {
                   Awaiting Input
                 </h3>
                 <p className="text-[10px] leading-relaxed text-muted-foreground/60 max-w-[200px] uppercase tracking-tight">
-                  Enter personnel details to initiate the institutional
-                  provisioning protocol.
+                  Enter student details to initiate the registration process.
                 </p>
               </div>
             )}

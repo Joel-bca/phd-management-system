@@ -209,7 +209,7 @@ export default function SupervisorDashboard() {
             </span>
           </h1>
           <p className="text-[10px] tracking-[0.3em] uppercase mt-2 text-muted-foreground font-bold">
-            Node: {user?.name?.toUpperCase() || "FACULTY_MEMBER"} • Protocol:
+            Dear Professor {user?.name?.toUpperCase() || "SUPERVISOR"} •
             SUPERVISORY_OVERVIEW • Status: ACTIVE
           </p>
         </div>
@@ -294,7 +294,7 @@ export default function SupervisorDashboard() {
             </div>
             <div>
               <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground font-bold mb-1">
-                Conducted Protocols
+                Completed Meetings
               </p>
               <h3 className="text-3xl font-medium tracking-tight uppercase">
                 {
@@ -311,7 +311,7 @@ export default function SupervisorDashboard() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border mb-12">
         <div className="flex gap-8 overflow-x-auto no-scrollbar pb-4 md:pb-0">
           {[
-            { id: "students", label: "Candidate Registry", icon: Users },
+            { id: "students", label: "Scholar Details", icon: Users },
             { id: "meetings", label: "Meeting Schedule", icon: CalendarClock },
           ].map((tab) => (
             <button

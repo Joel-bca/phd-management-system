@@ -102,7 +102,7 @@ export default function AdminDashboard() {
       {/* STATS STRIP */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border border-border mb-12 bg-card overflow-hidden">
         {[
-          { label: "Candidates", value: students.length, icon: Users },
+          { label: "Scholars", value: students.length, icon: Users },
           { label: "Faculty", value: supervisors.length, icon: UserCheck },
           { label: "Batches", value: batches.length, icon: Layers },
           {
@@ -169,7 +169,7 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-2 mb-6 border-b border-border pb-4">
                   <Lock className="h-3 w-3 text-destructive" />
                   <h3 className="text-[10px] tracking-[0.4em] uppercase font-bold text-destructive">
-                    Access Alerts
+                    Access Alerts | Number of Failed attempts
                   </h3>
                 </div>
                 <div className="space-y-4 max-h-[200px] overflow-y-auto no-scrollbar">

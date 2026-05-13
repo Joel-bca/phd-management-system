@@ -100,7 +100,7 @@ export default function Batches() {
               <form onSubmit={handleCreateBatch} className="space-y-6 pt-6">
                 <div className="space-y-2">
                   <label className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground font-bold">
-                    Identifier
+                    BATCH NAME
                   </label>
                   <Input
                     placeholder="E.G. 2024_INTAKE"
@@ -186,10 +186,7 @@ export default function Batches() {
                 Cycle
               </TableHead>
               <TableHead className="text-[10px] tracking-[0.3em] uppercase h-12">
-                Temporal_Stamp
-              </TableHead>
-              <TableHead className="text-[10px] tracking-[0.3em] uppercase pr-8 text-right h-12">
-                Actions
+                TIME STAMP
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -225,15 +222,6 @@ export default function Batches() {
                   </TableCell>
                   <TableCell className="text-muted-foreground text-[10px] font-mono">
                     {new Date(batch.created_at).toISOString().split("T")[0]}
-                  </TableCell>
-                  <TableCell className="text-right pr-8">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="rounded-[4px] text-[10px] tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      Edit_Node
-                    </Button>
                   </TableCell>
                 </TableRow>
               ))

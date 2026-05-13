@@ -134,10 +134,10 @@ export default function StudentDirectory() {
           <TableHeader className="bg-accent/5">
             <TableRow className="border-border hover:bg-transparent">
               <TableHead className="text-[10px] tracking-[0.3em] uppercase pl-8 h-14 font-bold text-muted-foreground">
-                Candidate Name
+                Scholar Name
               </TableHead>
               <TableHead className="text-[10px] tracking-[0.3em] uppercase h-14 font-bold text-muted-foreground">
-                Registry NO
+                REGISTRY NO
               </TableHead>
               <TableHead className="text-[10px] tracking-[0.3em] uppercase h-14 font-bold text-muted-foreground">
                 Field Discipline

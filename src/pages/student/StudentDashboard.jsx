@@ -150,7 +150,7 @@ export default function StudentDashboard() {
                   Supervisor
                 </span>
                 <span className="text-foreground font-bold text-right">
-                  {profile.student_supervisor_map?.[0]?.supervisors?.name ||
+                  {profile.student_supervisor_map?.[0]?.supervisors?.id ||
                     "UNASSIGNED"}
                 </span>
               </div>
