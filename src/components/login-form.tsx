@@ -101,7 +101,7 @@ export function LoginForm({
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@bcah.christuniversity.in"
+                  placeholder="name@bcah.christuniversity.in"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -115,7 +115,7 @@ export function LoginForm({
                 <Input
                   id="password"
                   type="password"
-                  placeholder="****"
+                  placeholder="******"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
