@@ -173,11 +173,11 @@ export default function MeetingHistory() {
           <div>
             <h1 className="text-4xl font-medium tracking-[0.1em] uppercase">
               <span className="text-primary">
-                RAH <span>History</span>
+                rac <span>History</span>
               </span>
             </h1>
             <p className="text-[10px] tracking-[0.3em] uppercase mt-2 text-muted-foreground font-bold">
-              Registry: RAH_ADVISORY_LOGS • Audit Mode
+              Registry: rac_ADVISORY_LOGS • Audit Mode
             </p>
           </div>
           <Button
@@ -222,7 +222,7 @@ export default function MeetingHistory() {
         </div>
 
         <Button
-          onClick={() => exportToCSV(filteredMeetings, "RAH_Audit_Logs")}
+          onClick={() => exportToCSV(filteredMeetings, "rac_Audit_Logs")}
           className="h-14 rounded-none bg-primary hover:bg-primary/90 text-white uppercase text-[10px] tracking-widest font-black gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
         >
           <Download className="h-4 w-4" /> Export_Audit_Logs

@@ -61,7 +61,7 @@ export const SIDEBAR_ROUTES = [
         icon: CalendarClock,
       },
       {
-        title: "RAH Logs",
+        title: "rac Logs",
         path: "/admin/history",
         icon: FileText,
       },

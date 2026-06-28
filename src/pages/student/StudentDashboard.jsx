@@ -287,7 +287,7 @@ export default function StudentDashboard() {
                 <span className="text-primary">Research Tracker</span>
               </h3>
               <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground font-bold mt-1">
-                Status: RAH Meetings Tracker
+                Status: rac Meetings Tracker
               </p>
             </div>
           </div>
@@ -367,7 +367,7 @@ export default function StudentDashboard() {
                 </div>
                 <div>
                   <h4 className="text-sm font-bold uppercase tracking-widest">
-                    Next Scheduled RAH Meeting
+                    Next Scheduled rac Meeting
                   </h4>
                   <p className="text-[10px] uppercase text-muted-foreground tracking-tight mt-1">
                     Meeting #{upcomingMeeting.meeting_number} •{" "}
