@@ -230,102 +230,76 @@ export default function MeetingHistory() {
       </div>
 
       {/* REGISTRY TABLE */}
-      <div className="border border-border bg-card shadow-2xl shadow-black/5 overflow-hidden">
-        <Table>
-          <TableHeader className="bg-accent/5">
-            <TableRow className="hover:bg-transparent border-b border-border">
-              <TableHead className="w-[120px] text-[10px] font-black uppercase tracking-widest py-6 pl-8">
-                TIme
-              </TableHead>
-              <TableHead className="text-[10px] font-black uppercase tracking-widest py-6">
-                Name
-              </TableHead>
-              <TableHead className="text-[10px] font-black uppercase tracking-widest py-6 text-center">
-                RAH Status
-              </TableHead>
-              <TableHead className="text-right pr-8 text-[10px] font-black uppercase tracking-widest py-6">
-                Actions
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={4} className="py-32 text-center">
-                  <RefreshCw className="h-8 w-8 animate-spin text-primary/20 mx-auto mb-4" />
-                  <p className="text-[10px] tracking-[0.4em] uppercase font-bold text-muted-foreground/40">
-                    Synchronizing_Archive...
-                  </p>
-                </TableCell>
-              </TableRow>
-            ) : filteredMeetings.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} className="py-32 text-center">
-                  <div className="bg-accent/5 p-6 inline-block mb-4">
-                    <History className="h-8 w-8 text-muted-foreground/20" />
-                  </div>
-                  <p className="text-[10px] tracking-[0.4em] uppercase font-bold text-muted-foreground/40">
-                    No_Historical_Protocols_Found
-                  </p>
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredMeetings.map((meeting) => (
-                <TableRow
-                  key={meeting.id}
-                  className="group hover:bg-accent/5 border-b border-border last:border-0 transition-all"
-                >
-                  <TableCell className="py-8 pl-8">
-                    <div className="flex flex-col">
-                      <span className="text-[11px] font-bold text-foreground font-mono">
-                        {format(new Date(meeting.meeting_date), "dd.MM.yy")}
-                      </span>
-                      <span className="text-[9px] text-muted-foreground uppercase font-medium mt-1">
-                        {format(new Date(meeting.meeting_date), "HH:mm")}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col gap-1.5">
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 bg-primary/10 border border-primary/20 flex items-center justify-center text-[9px] font-black text-primary">
-                          C
-                        </div>
-                        <span className="text-[10px] font-black uppercase tracking-wider text-foreground">
-                          {meeting.scholar?.student_name || "UNKNOWN_CANDIDATE"}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 bg-amber-50 border border-amber-200 flex items-center justify-center text-[9px] font-black text-amber-600">
-                          S
-                        </div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                          {meeting.supervisor?.name || "UNASSIGNED_FACULTY"}
-                        </span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex justify-center">
-                      {getStatusBadge(meeting)}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right pr-8">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setSelectedMeeting(meeting)}
-                      className="rounded-none h-10 w-10 p-0 border border-transparent hover:border-border hover:bg-white transition-all shadow-sm group/btn"
-                    >
-                      <MoreVertical className="h-4 w-4 text-muted-foreground group-hover/btn:text-primary" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <div className="border border-border bg-card overflow-hidden">
+  <Table>
+    <TableHeader className="bg-accent/5">
+      <TableRow>
+        <TableHead>No</TableHead>
+        <TableHead>RAC Date</TableHead>
+        <TableHead>RAC Comments</TableHead>
+        <TableHead>KP Updated Date</TableHead>
+        <TableHead>Publication Title</TableHead>
+        <TableHead>Journal Details</TableHead>
+        <TableHead className="text-center">Action</TableHead>
+      </TableRow>
+    </TableHeader>
+
+    <TableBody>
+      {loading ? (
+        <TableRow>
+          <TableCell colSpan={7} className="text-center py-10">
+            Loading...
+          </TableCell>
+        </TableRow>
+      ) : filteredMeetings.length === 0 ? (
+        <TableRow>
+          <TableCell colSpan={7} className="text-center py-10">
+            No Records Found
+          </TableCell>
+        </TableRow>
+      ) : (
+        filteredMeetings.map((meeting, index) => (
+          <TableRow key={meeting.id}>
+            <TableCell>{index + 1}</TableCell>
+
+            <TableCell>
+              {meeting.meeting_date
+                ? format(new Date(meeting.meeting_date), "dd/MM/yyyy")
+                : "--"}
+            </TableCell>
+
+            <TableCell>
+              {meeting.rac_comments || "--"}
+            </TableCell>
+
+            <TableCell>
+              {meeting.kp_updated_date || "--"}
+            </TableCell>
+
+            <TableCell>
+              {meeting.publication_title || "--"}
+            </TableCell>
+
+            <TableCell>
+              {meeting.journal_details || "--"}
+            </TableCell>
+
+            <TableCell className="text-center">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setSelectedMeeting(meeting)}
+              >
+                View
+              </Button>
+            </TableCell>
+          </TableRow>
+        ))
+      )}
+    </TableBody>
+  </Table>
+</div>
+
 
       {/* SESSION DETAILS MODAL */}
       <Dialog
