@@ -90,8 +90,8 @@ export const studentService = {
       body: JSON.stringify(data),
     }),
 
-  // Fetches RAH (Research Advisory Health) meetings for the logged-in student
-  getRAHMeetings: () => apiFetch("/student/meetings"),
+  // Fetches rac (Research Advisory Health) meetings for the logged-in student
+  getracMeetings: () => apiFetch("/student/meetings"),
 };
 
 export const supervisorService = {

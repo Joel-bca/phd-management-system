@@ -120,7 +120,7 @@ export default function StudentProfileModal({ student, onClose }) {
           {/* MEETING LOGS */}
           <section className="space-y-6 pb-10">
             <h3 className="text-[11px] tracking-[0.4em] uppercase font-black text-primary/60 border-b border-primary/10 pb-2">
-              RAH Session Registry
+              rac Session Registry
             </h3>
             <div className="border border-border">
               <table className="w-full text-left text-[10px] tracking-widest uppercase font-bold">
@@ -133,8 +133,8 @@ export default function StudentProfileModal({ student, onClose }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {student.rah_meetings?.length > 0 ? (
-                    student.rah_meetings
+                  {student.rac_meetings?.length > 0 ? (
+                    student.rac_meetings
                       .sort((a, b) => a.meeting_number - b.meeting_number)
                       .map((m) => (
                         <tr
