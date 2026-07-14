@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { jsPDF } from "jspdf";
+import { autoTable } from "jspdf-autotable";
 import {
   Calendar,
   Search,
@@ -45,59 +47,90 @@ export default function MeetingHistory() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedMeeting, setSelectedMeeting] = useState(null);
 
-  const exportToCSV = (data, filename) => {
+  const exportToPDF = async (data, filename) => {
     if (!data) return;
+
+    const doc = new jsPDF();
+    
+    // Add University Logo
+    try {
+      const img = new Image();
+      img.src = '/christ-logo.png';
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+      // Try to maintain aspect ratio for a standard logo height of 20
+      const imgWidth = (img.width * 20) / img.height;
+      doc.addImage(img, 'PNG', 14, 10, imgWidth, 20);
+    } catch (e) {
+      console.warn("Could not load logo for PDF:", e);
+    }
+
+    doc.setFontSize(22);
+    doc.setTextColor(0, 0, 128); // Dark blue text
+    doc.text("RAC HISTORY REPORT", 14, 40);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Generated Date: ${format(new Date(), "PPpp")}`, 14, 48);
 
     // Define Headers
     const headers = [
+      "No.",
       "Meeting Date",
       "Scholar Name",
-      "Register Number",
+      "Reg No.",
       "Supervisor",
       "Subject",
-      "Mode",
-      "Location",
       "Status",
-      "Purged",
-      "Remarks",
     ];
 
     // Map Data
     const items = Array.isArray(data) ? data : [data];
     const rows = items
       .filter(Boolean)
-      .map((m) => [
-        format(new Date(m.meeting_date), "yyyy-MM-dd HH:mm"),
-        m.scholar?.student_name || "N/A",
-        m.scholar?.register_number || "N/A",
-        m.supervisor?.name || "N/A",
-        m.meeting_subject || "N/A",
-        m.meeting_mode || "N/A",
-        m.meeting_location || "N/A",
-        m.status || "pending",
-        m.Status_deletion === false ? "YES" : "NO",
-        m.remarks || "",
+      .map((m, idx) => [
+        idx + 1,
+        m.meeting_date ? format(new Date(m.meeting_date), "dd/MM/yyyy") : "--",
+        m.scholar?.student_name || "--",
+        m.scholar?.register_number || "--",
+        m.supervisor?.name || "--",
+        m.meeting_subject || "--",
+        m.status?.toUpperCase() || "PENDING",
       ]);
 
-    const csvContent = [
-      headers.join(","),
-      ...rows.map((r) =>
-        r.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
-      ),
-    ].join("\n");
+    autoTable(doc, {
+      head: [headers],
+      body: rows,
+      startY: 55,
+      theme: 'grid',
+      styles: { fontSize: 8, cellPadding: 3 },
+      headStyles: { fillColor: [30, 58, 138], textColor: 255 }, // Dark blue header
+      alternateRowStyles: { fillColor: [249, 250, 251] },
+    });
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `${filename}_${format(new Date(), "yyyyMMdd")}.csv`,
-    );
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // If single protocol, print detailed info
+    if (!Array.isArray(data) || items.length === 1) {
+      const singleData = items[0];
+      const finalY = doc.lastAutoTable.finalY || 55;
+      
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.text("Session Details", 14, finalY + 15);
+      
+      doc.setFontSize(10);
+      doc.text(`Access Point: ${singleData.meeting_location || "--"}`, 14, finalY + 23);
+      doc.text(`Protocol Mode: ${singleData.meeting_mode || "--"}`, 14, finalY + 29);
+      doc.text(`Index Position: PROTOCOL_#${singleData.meeting_number || "--"}`, 14, finalY + 35);
+      doc.text(`Registry Log Time: ${singleData.created_at ? format(new Date(singleData.created_at), "PPpp") : "--"}`, 14, finalY + 41);
+      
+      doc.text("Post-Session Observations:", 14, finalY + 51);
+      doc.setFont(undefined, 'italic');
+      doc.text(singleData.remarks || "No observations recorded.", 14, finalY + 57, { maxWidth: 180 });
+    }
+
+    doc.save(`${filename}_${format(new Date(), "yyyyMMdd")}.pdf`);
   };
 
   const fetchData = async () => {
@@ -222,7 +255,7 @@ export default function MeetingHistory() {
         </div>
 
         <Button
-          onClick={() => exportToCSV(filteredMeetings, "rac_Audit_Logs")}
+          onClick={() => exportToPDF(filteredMeetings, "rac_Audit_Logs")}
           className="h-14 rounded-none bg-primary hover:bg-primary/90 text-white uppercase text-[10px] tracking-widest font-black gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
         >
           <Download className="h-4 w-4" /> Export_Audit_Logs
@@ -393,7 +426,7 @@ export default function MeetingHistory() {
               variant="outline"
               onClick={() =>
                 selectedMeeting &&
-                exportToCSV(
+                exportToPDF(
                   selectedMeeting,
                   `Protocol_${selectedMeeting.meeting_number}`,
                 )
