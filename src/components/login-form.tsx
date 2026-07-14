@@ -44,9 +44,7 @@ export function LoginForm({
     e.preventDefault();
 
     try {
-      const apiBaseUrl = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
-      const loginUrl = apiBaseUrl ? `${apiBaseUrl}/api/auth/login` : "/api/auth/login";
-      const res = await fetch(loginUrl, {
+      const res = await fetch("/api/auth/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
