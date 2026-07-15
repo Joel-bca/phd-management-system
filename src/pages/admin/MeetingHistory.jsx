@@ -88,6 +88,12 @@ export default function MeetingHistory() {
 
     // Map Data
     const items = Array.isArray(data) ? data : [data];
+    
+    if (items.filter(Boolean).length === 0) {
+      toast.error("No records to export. Check your search/filter and try again.");
+      return;
+    }
+
     const rows = items
       .filter(Boolean)
       .map((m, idx) => [
@@ -255,6 +261,7 @@ export default function MeetingHistory() {
         </div>
 
         <Button
+          disabled={loading}
           onClick={() => exportToPDF(filteredMeetings, "rac_Audit_Logs")}
           className="h-14 rounded-none bg-primary hover:bg-primary/90 text-white uppercase text-[10px] tracking-widest font-black gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
         >
@@ -423,6 +430,7 @@ export default function MeetingHistory() {
 
           <div className="p-8 bg-accent/5 border-t border-border flex justify-between gap-4">
             <Button
+              disabled={loading}
               variant="outline"
               onClick={() =>
                 selectedMeeting &&
