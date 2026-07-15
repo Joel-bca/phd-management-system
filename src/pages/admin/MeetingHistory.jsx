@@ -348,7 +348,7 @@ export default function MeetingHistory() {
       >
         <DialogContent className="max-w-2xl rounded-none border border-border p-0 bg-white overflow-hidden font-sans">
           <DialogHeader className="p-8 bg-accent/5 border-b border-border">
-            <div className="flex justify-between items-start">
+            <div className="flex justify-between items-start pr-12">
               <div>
                 <DialogTitle className="text-2xl font-medium uppercase tracking-tight">
                   Protocol <span className="text-primary">Details</span>
