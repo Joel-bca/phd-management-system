@@ -129,7 +129,6 @@ export default function AppSidebar({
                     defaultOpen={
                       section.defaultOpen || isSectionActive(section)
                     }
-                    className="group/collapsible"
                   >
                     <SidebarMenuItem>
 
@@ -137,7 +136,7 @@ export default function AppSidebar({
                         render={
                           <SidebarMenuButton
                             tooltip={section.title}
-                            className="h-11 rounded-lg"
+                            className="h-11 rounded-lg group/collapsible"
                           />
                         }
                       >
@@ -154,7 +153,7 @@ export default function AppSidebar({
                   w-4
                   transition-transform
                   duration-200
-                  group-data-[state=open]/collapsible:rotate-90
+                  group-data-[panel-open]/collapsible:rotate-90
                   group-data-[collapsible=icon]:hidden
                 "
                         />
