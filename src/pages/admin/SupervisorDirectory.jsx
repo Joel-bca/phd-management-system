@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/table";
 import { toast } from "sonner";
 
-export default function SupervisorDirectory() {
+export default function SupervisorDirectory({ embedded = false }) {
   const [supervisors, setSupervisors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,11 +53,11 @@ export default function SupervisorDirectory() {
   );
 
   return (
-    <div>
+    <div className={embedded ? "font-sans" : "min-h-screen bg-background p-4 md:p-8 font-sans"}>
       {/* HEADER */}
-      <header className="mb-8 flex flex-col md:flex-row justify-between items-baseline gap-4 border-b border-border pb-6">
+      <header className="mb-12 flex flex-col md:flex-row justify-between items-baseline gap-4 border-b border-border pb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-medium tracking-[0.1em] uppercase">
+          <h1 className="text-4xl md:text-5xl font-medium tracking-[0.1em] uppercase">
             <span className="text-primary">
               Supervisors <span className="">Directory</span>
             </span>

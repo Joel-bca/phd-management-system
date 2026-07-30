@@ -76,7 +76,7 @@ export const sendCredentials = async (
                       </tr>
                       <tr>
                         <td style="font-size:14px;">
-                          <strong>Temporary Password:</strong>
+                          <strong>Password:</strong>
                           <span style="background:#e5e7eb; padding:4px 8px; display:inline-block;">
                             ${password}
                           </span>

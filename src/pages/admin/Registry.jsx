@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import {
   Users,
@@ -21,11 +21,47 @@ import StudentDirectory from "./StudentDirectory";
 import SupervisorDirectory from "./SupervisorDirectory";
 
 export default function Registry() {
-  const location = useLocation();
   const [activeTab, setActiveTab] = useState("student");
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+
+  const location = useLocation();
+  const directorySectionRef = useRef(null);
+  const pendingScrollRef = useRef(null);
+
+  // Sidebar links to Personnel Registry with #students / #supervisors.
+  // When the hash changes, switch to the matching tab and flag that we
+  // still need to scroll to it once that tab's content has rendered.
+  useEffect(() => {
+    const hash = location.hash.replace("#", "");
+
+    if (hash === "students") {
+      pendingScrollRef.current = "students";
+      setActiveTab("student");
+    } else if (hash === "supervisors") {
+      pendingScrollRef.current = "supervisors";
+      setActiveTab("supervisor");
+    }
+  }, [location.hash]);
+
+  // Once the tab matching the pending hash has actually rendered,
+  // scroll to it smoothly. Manual tab clicks never set pendingScrollRef,
+  // so they never trigger a scroll here.
+  useEffect(() => {
+    if (!pendingScrollRef.current) return;
+
+    const expectedId = activeTab === "student" ? "students" : "supervisors";
+    if (pendingScrollRef.current !== expectedId) return;
+
+    const el = document.getElementById(expectedId);
+    if (el) {
+      requestAnimationFrame(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+    pendingScrollRef.current = null;
+  }, [activeTab]);
 
   // Fetch batches for the dropdown on mount
   const loadBatches = async () => {
@@ -43,21 +79,6 @@ export default function Registry() {
   useEffect(() => {
     loadBatches();
   }, []);
-
-  // Scroll to #students or #supervisors when the hash changes (or on load)
-  useEffect(() => {
-    if (!location.hash) return;
-
-    const id = location.hash.replace("#", "");
-    const timeout = setTimeout(() => {
-      const el = document.getElementById(id);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 100);
-
-    return () => clearTimeout(timeout);
-  }, [location.hash, location.key]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -114,7 +135,7 @@ export default function Registry() {
         </Button>
       </header>
 
-      <div className="max-w-4xl mx-auto mb-24">
+      <div className="max-w-4xl mx-auto">
         {/* TABS */}
         <div className="flex gap-8 border-b border-border mb-12">
           {[
@@ -323,17 +344,20 @@ export default function Registry() {
             )}
           </div>
         </div>
+
+        {/* DIRECTORY SECTION — anchor target for sidebar nav (#students / #supervisors) */}
+        <div
+          ref={directorySectionRef}
+          id={activeTab === "student" ? "students" : "supervisors"}
+          className="mt-16 scroll-mt-24"
+        >
+          {activeTab === "student" ? (
+            <StudentDirectory embedded />
+          ) : (
+            <SupervisorDirectory embedded />
+          )}
+        </div>
       </div>
-
-      {/* STUDENT DIRECTORY */}
-      <section id="students" className="scroll-mt-24 mb-24">
-        <StudentDirectory />
-      </section>
-
-      {/* SUPERVISOR DIRECTORY */}
-      <section id="supervisors" className="scroll-mt-24">
-        <SupervisorDirectory />
-      </section>
     </div>
   );
 }
