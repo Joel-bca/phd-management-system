@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/table";
 import { toast } from "sonner";
 
-export default function StudentDirectory() {
+export default function StudentDirectory({ embedded = false }) {
   const [students, setStudents] = useState([]);
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -73,7 +73,7 @@ export default function StudentDirectory() {
   });
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8 font-sans">
+    <div className={embedded ? "font-sans" : "min-h-screen bg-background p-4 md:p-8 font-sans"}>
       {/* HEADER */}
       <header className="mb-12 flex flex-col md:flex-row justify-between items-baseline gap-4 border-b border-border pb-6">
         <div>
