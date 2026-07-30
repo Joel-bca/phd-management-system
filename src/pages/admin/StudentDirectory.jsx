@@ -82,9 +82,7 @@ export default function StudentDirectory() {
               Student <span className="text-primary">Directory</span>
             </span>
           </h1>
-          <p className="text-[10px] tracking-[0.3em] uppercase mt-2 text-muted-foreground font-bold">
-            Catalog: CANDIDATES • System: ACTIVE • Encryption: AES-256
-          </p>
+          
         </div>
         <div className="flex gap-4">
           <Button
