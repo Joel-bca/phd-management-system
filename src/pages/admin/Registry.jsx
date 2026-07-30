@@ -74,16 +74,10 @@ export default function Registry() {
           <h1 className="text-4xl md:text-5xl font-medium tracking-[0.1em] uppercase">
             <span className="text-primary">
               {" "}
-              Personnel <span className="text-primary">Registry</span>
+              Personal <span className="text-primary">Registry</span>
             </span>
           </h1>
-          <p className="text-[10px] tracking-[0.3em] uppercase mt-2 text-muted-foreground font-bold">
-            Mode:{" "}
-            {activeTab === "student"
-              ? "CANDIDATE_ENROLLMENT"
-              : "FACULTY_PROVISIONING"}{" "}
-            • Protocol: SECURE
-          </p>
+          
         </div>
         <Button
           onClick={loadBatches}
@@ -274,7 +268,7 @@ export default function Registry() {
                   <div className="flex items-start gap-3 bg-black/10 p-4">
                     <ShieldCheck className="h-4 w-4 text-white mt-1 shrink-0" />
                     <p className="text-[11px] leading-relaxed text-white/80 italic font-light">
-                      Personnel record has been encrypted and synchronized. An
+                      Personal record has been encrypted and synchronized. An
                       automated onboarding mail has been dispatched to the
                       personal email address provided.
                     </p>

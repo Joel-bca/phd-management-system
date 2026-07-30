@@ -62,9 +62,7 @@ export default function SupervisorDirectory() {
               Supervisors <span className="">Directory</span>
             </span>
           </h1>
-          <p className="text-[10px] tracking-[0.3em] uppercase mt-2 text-muted-foreground font-bold">
-            Catalog: SUPERVISORS • System: ACTIVE • Encryption: AES-256
-          </p>
+        
         </div>
         <div className="flex gap-4">
           <Button
