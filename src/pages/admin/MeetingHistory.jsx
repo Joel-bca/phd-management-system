@@ -350,7 +350,7 @@ export default function MeetingHistory() {
           <DialogHeader className="p-8 bg-accent/5 border-b border-border">
             <div className="flex justify-between items-start pr-12">
               <div>
-                <DialogTitle className="text-2xl font-medium uppercase tracking-tight text-primary">
+                <DialogTitle className="text-2xl font-medium uppercase tracking-tight text-blue-500">
                   Meeting Details
                 </DialogTitle>
               </div>
