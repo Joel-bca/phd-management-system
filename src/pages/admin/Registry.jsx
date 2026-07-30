@@ -36,10 +36,14 @@ export default function Registry() {
   useEffect(() => {
     const hash = location.hash.replace("#", "");
 
-    if (hash === "students") {
+    if (hash === "students" || hash === "student") {
       pendingScrollRef.current = "students";
       setActiveTab("student");
-    } else if (hash === "supervisors") {
+    } else if (
+      hash === "supervisors" ||
+      hash === "supervisor" ||
+      hash === "faculty"
+    ) {
       pendingScrollRef.current = "supervisors";
       setActiveTab("supervisor");
     }
