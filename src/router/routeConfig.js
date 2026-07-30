@@ -42,7 +42,7 @@ export const SIDEBAR_ROUTES = [
       },
       {
         title: "Faculty",
-        path: "/admin/registry#faculty",
+        path: "/admin/registry#supervisors",
         icon: Users,
       },
     ],
