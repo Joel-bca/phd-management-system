@@ -37,12 +37,12 @@ export const SIDEBAR_ROUTES = [
       },
       {
         title: "Students",
-        path: "/admin/students",
+        path: "/admin/registry#students",
         icon: GraduationCap,
       },
       {
         title: "Faculty",
-        path: "/admin/faculty",
+        path: "/admin/registry#faculty",
         icon: Users,
       },
     ],
