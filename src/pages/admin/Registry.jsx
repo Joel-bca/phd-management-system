@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Users,
   UserCheck,
@@ -16,8 +17,11 @@ import { hodService } from "../../services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import StudentDirectory from "./StudentDirectory";
+import SupervisorDirectory from "./SupervisorDirectory";
 
 export default function Registry() {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("student");
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -39,6 +43,21 @@ export default function Registry() {
   useEffect(() => {
     loadBatches();
   }, []);
+
+  // Scroll to #students or #supervisors when the hash changes (or on load)
+  useEffect(() => {
+    if (!location.hash) return;
+
+    const id = location.hash.replace("#", "");
+    const timeout = setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, [location.hash, location.key]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -95,7 +114,7 @@ export default function Registry() {
         </Button>
       </header>
 
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto mb-24">
         {/* TABS */}
         <div className="flex gap-8 border-b border-border mb-12">
           {[
@@ -305,6 +324,16 @@ export default function Registry() {
           </div>
         </div>
       </div>
+
+      {/* STUDENT DIRECTORY */}
+      <section id="students" className="scroll-mt-24 mb-24">
+        <StudentDirectory />
+      </section>
+
+      {/* SUPERVISOR DIRECTORY */}
+      <section id="supervisors" className="scroll-mt-24">
+        <SupervisorDirectory />
+      </section>
     </div>
   );
 }
