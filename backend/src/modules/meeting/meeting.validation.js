@@ -18,4 +18,7 @@ export const updateMeetingSchema = z.object({
   meeting_subject: z.string().optional(),
   meeting_location: z.string().optional(),
   meeting_mode: z.enum(["online", "offline"]).optional(),
+  kp_upload_date: z.string().optional().nullable(),
+  publication_title: z.string().optional().nullable(),
+  journal_details: z.string().optional().nullable(),
 });
