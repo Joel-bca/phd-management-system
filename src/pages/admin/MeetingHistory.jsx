@@ -19,7 +19,7 @@ import {
   MessageSquare,
   Info,
 } from "lucide-react";
-import { hodService } from "../../services/api";
+import { hodService, meetingService } from "../../services/api";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +46,29 @@ export default function MeetingHistory() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedMeeting, setSelectedMeeting] = useState(null);
+
+  const handleUpdate = async () => {
+    try {
+      const { id, kp_upload_date, publication_title, journal_details } = selectedMeeting;
+      await meetingService.updateMeeting(id, {
+        kp_upload_date: kp_upload_date || null,
+        publication_title: publication_title || null,
+        journal_details: journal_details || null,
+      });
+
+      toast.success("Updated");
+
+      setMeetings((prev) =>
+        prev.map((m) =>
+          m.id === id
+            ? { ...m, kp_upload_date: kp_upload_date || null, publication_title: publication_title || null, journal_details: journal_details || null }
+            : m
+        )
+      );
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
 
   const exportToPDF = async (data, filename) => {
     if (!data) return;
@@ -425,9 +448,74 @@ export default function MeetingHistory() {
                 </div>
               </div>
             )}
+
+            {/* EDITABLE FIELDS */}
+            <div className="space-y-6 pt-6 border-t border-border">
+              <h4 className="text-[10px] tracking-[0.3em] uppercase font-bold text-foreground">
+                Publication Details
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <label className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground font-black flex items-center gap-2">
+                    KP Updated Date
+                  </label>
+                  <Input
+                    type="date"
+                    value={selectedMeeting?.kp_upload_date ? selectedMeeting.kp_upload_date.split('T')[0] : ""}
+                    onChange={(e) =>
+                      setSelectedMeeting({
+                        ...selectedMeeting,
+                        kp_upload_date: e.target.value,
+                      })
+                    }
+                    className="h-14 bg-accent/5 border-border focus:border-primary rounded-none text-[10px] tracking-widest font-bold uppercase transition-all px-4"
+                  />
+                </div>
+                <div className="space-y-3">
+                  <label className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground font-black flex items-center gap-2">
+                    Publication Title
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="Enter Title"
+                    value={selectedMeeting?.publication_title || ""}
+                    onChange={(e) =>
+                      setSelectedMeeting({
+                        ...selectedMeeting,
+                        publication_title: e.target.value,
+                      })
+                    }
+                    className="h-14 bg-accent/5 border-border focus:border-primary rounded-none text-[10px] tracking-widest font-bold uppercase transition-all px-4"
+                  />
+                </div>
+                <div className="space-y-3 md:col-span-2">
+                  <label className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground font-black flex items-center gap-2">
+                    Journal Details
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="Enter Journal Details"
+                    value={selectedMeeting?.journal_details || ""}
+                    onChange={(e) =>
+                      setSelectedMeeting({
+                        ...selectedMeeting,
+                        journal_details: e.target.value,
+                      })
+                    }
+                    className="h-14 bg-accent/5 border-border focus:border-primary rounded-none text-[10px] tracking-widest font-bold uppercase transition-all px-4"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="p-8 bg-accent/5 border-t border-border flex justify-between gap-4">
+            <Button
+              onClick={handleUpdate}
+              className="rounded-none bg-primary hover:bg-primary/90 text-white uppercase text-[10px] tracking-widest font-black flex-1 h-12"
+            >
+              Save
+            </Button>
             <Button
               disabled={loading}
               variant="outline"
