@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Users,
   UserCheck,
@@ -16,12 +17,51 @@ import { hodService } from "../../services/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import StudentDirectory from "./StudentDirectory";
+import SupervisorDirectory from "./SupervisorDirectory";
 
 export default function Registry() {
   const [activeTab, setActiveTab] = useState("student");
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+
+  const location = useLocation();
+  const directorySectionRef = useRef(null);
+  const pendingScrollRef = useRef(null);
+
+  // Sidebar links to Personnel Registry with #students / #supervisors.
+  // When the hash changes, switch to the matching tab and flag that we
+  // still need to scroll to it once that tab's content has rendered.
+  useEffect(() => {
+    const hash = location.hash.replace("#", "");
+
+    if (hash === "students") {
+      pendingScrollRef.current = "students";
+      setActiveTab("student");
+    } else if (hash === "supervisors") {
+      pendingScrollRef.current = "supervisors";
+      setActiveTab("supervisor");
+    }
+  }, [location.hash]);
+
+  // Once the tab matching the pending hash has actually rendered,
+  // scroll to it smoothly. Manual tab clicks never set pendingScrollRef,
+  // so they never trigger a scroll here.
+  useEffect(() => {
+    if (!pendingScrollRef.current) return;
+
+    const expectedId = activeTab === "student" ? "students" : "supervisors";
+    if (pendingScrollRef.current !== expectedId) return;
+
+    const el = document.getElementById(expectedId);
+    if (el) {
+      requestAnimationFrame(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+    pendingScrollRef.current = null;
+  }, [activeTab]);
 
   // Fetch batches for the dropdown on mount
   const loadBatches = async () => {
@@ -67,23 +107,17 @@ export default function Registry() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8 font-sans">
+    <div className="min-h-screen bg-background p-4 md:p-8 font-sans overflow-x-hidden">
       {/* HEADER */}
       <header className="mb-12 flex flex-col md:flex-row justify-between items-baseline gap-4 border-b border-border pb-6">
         <div>
           <h1 className="text-4xl md:text-5xl font-medium tracking-[0.1em] uppercase">
             <span className="text-primary">
               {" "}
-              Personnel <span className="text-primary">Registry</span>
+              Personal <span className="text-primary">Registry</span>
             </span>
           </h1>
-          <p className="text-[10px] tracking-[0.3em] uppercase mt-2 text-muted-foreground font-bold">
-            Mode:{" "}
-            {activeTab === "student"
-              ? "CANDIDATE_ENROLLMENT"
-              : "FACULTY_PROVISIONING"}{" "}
-            • Protocol: SECURE
-          </p>
+          
         </div>
         <Button
           onClick={loadBatches}
@@ -124,66 +158,66 @@ export default function Registry() {
           {/* FORM SECTION */}
           <div className="lg:col-span-7">
             <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {activeTab === "student" ? (
                   <>
-                    <div className="space-y-2 col-span-2">
+                    <div className="space-y-2 lg:col-span-2 min-w-0">
                       <Label text="Full Name" icon={Users} />
                       <Input
                         name="name"
                         placeholder="Wellesley C Bailey"
                         required
-                        className="rounded-none border-border h-12 uppercase text-xs tracking-wider"
+                        className="w-full rounded-none border-border h-12 uppercase text-xs tracking-wider"
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 min-w-0">
                       <Label text="Register Number" icon={Fingerprint} />
                       <Input
                         name="register_number"
                         placeholder="2543141"
                         required
-                        className="rounded-none border-border h-12 uppercase text-xs tracking-wider"
+                        className="w-full rounded-none border-border h-12 uppercase text-xs tracking-wider"
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 min-w-0">
                       <Label text="Discipline" icon={BookOpen} />
                       <Input
                         name="discipline"
                         placeholder="COmputer Science"
                         required
-                        className="rounded-none border-border h-12 uppercase text-xs tracking-wider"
+                        className="w-full rounded-none border-border h-12 uppercase text-xs tracking-wider"
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 min-w-0">
                       <Label text="University Email" icon={Mail} />
                       <Input
                         name="university_email"
                         type="email"
                         placeholder="@bcah.christuniversity.in"
                         required
-                        className="rounded-none border-border h-12 text-xs"
+                        className="w-full rounded-none border-border h-12 text-xs"
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 min-w-0">
                       <Label text="Personal Email" icon={Mail} />
                       <Input
                         name="personal_email"
                         type="email"
                         placeholder="@gmail.com"
                         required
-                        className="rounded-none border-border h-12 text-xs"
+                        className="w-full rounded-none border-border h-12 text-xs"
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 min-w-0">
                       <Label text="Campus" icon={Layers} />
                       <Input
                         name="campus"
                         placeholder="Campus"
                         required
-                        className="rounded-none border-border h-12 uppercase text-xs tracking-wider"
+                        className="w-full rounded-none border-border h-12 uppercase text-xs tracking-wider"
                       />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 min-w-0">
                       <Label text="Batch Selection" icon={Layers} />
                       <select
                         name="batch_id"
@@ -201,32 +235,32 @@ export default function Registry() {
                   </>
                 ) : (
                   <>
-                    <div className="space-y-2 col-span-2">
+                    <div className="space-y-2 lg:col-span-2 min-w-0">
                       <Label text="Full Name" icon={Users} />
                       <Input
                         name="name"
                         placeholder="E.G. DR. ADA LOVELACE"
                         required
-                        className="rounded-none border-border h-12 uppercase text-xs tracking-wider"
+                        className="w-full rounded-none border-border h-12 uppercase text-xs tracking-wider"
                       />
                     </div>
-                    <div className="space-y-2 col-span-2">
+                    <div className="space-y-2 lg:col-span-2 min-w-0">
                       <Label text="Official Email" icon={Mail} />
                       <Input
                         name="email"
                         type="email"
                         placeholder="FACULTY@INSTITUTION.EDU"
                         required
-                        className="rounded-none border-border h-12 text-xs"
+                        className="w-full rounded-none border-border h-12 text-xs"
                       />
                     </div>
-                    <div className="space-y-2 col-span-2">
+                    <div className="space-y-2 lg:col-span-2 min-w-0">
                       <Label text="Mobile Number" icon={Phone} />
                       <Input
                         name="mobile"
                         placeholder="+91 XXXXX XXXXX"
                         required
-                        className="rounded-none border-border h-12 text-xs"
+                        className="w-full rounded-none border-border h-12 text-xs"
                       />
                     </div>
                   </>
@@ -274,7 +308,7 @@ export default function Registry() {
                   <div className="flex items-start gap-3 bg-black/10 p-4">
                     <ShieldCheck className="h-4 w-4 text-white mt-1 shrink-0" />
                     <p className="text-[11px] leading-relaxed text-white/80 italic font-light">
-                      Personnel record has been encrypted and synchronized. An
+                      Personal record has been encrypted and synchronized. An
                       automated onboarding mail has been dispatched to the
                       personal email address provided.
                     </p>
@@ -303,6 +337,19 @@ export default function Registry() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* DIRECTORY SECTION — anchor target for sidebar nav (#students / #supervisors) */}
+        <div
+          ref={directorySectionRef}
+          id={activeTab === "student" ? "students" : "supervisors"}
+          className="mt-16 scroll-mt-24"
+        >
+          {activeTab === "student" ? (
+            <StudentDirectory embedded />
+          ) : (
+            <SupervisorDirectory embedded />
+          )}
         </div>
       </div>
     </div>

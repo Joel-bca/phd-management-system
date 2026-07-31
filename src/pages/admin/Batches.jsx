@@ -69,9 +69,7 @@ export default function Batches() {
               Batch <span className="text-primary">Management</span>{" "}
             </span>
           </h1>
-          <p className="text-sm tracking-[0.3em] uppercase mt-2 text-muted-foreground font-light">
-            Temporal Infrastructure Configuration
-          </p>
+         
         </div>
         <div className="flex gap-4">
           <Button
