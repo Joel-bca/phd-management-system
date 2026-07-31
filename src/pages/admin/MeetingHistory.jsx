@@ -51,7 +51,7 @@ export default function MeetingHistory() {
     if (!data) return;
 
     const doc = new jsPDF();
-    
+
     // Add University Logo
     try {
       const img = new Image();
@@ -70,7 +70,7 @@ export default function MeetingHistory() {
     doc.setFontSize(22);
     doc.setTextColor(0, 0, 128); // Dark blue text
     doc.text("RAC HISTORY REPORT", 14, 40);
-    
+
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text(`Generated Date: ${format(new Date(), "PPpp")}`, 14, 48);
@@ -88,7 +88,7 @@ export default function MeetingHistory() {
 
     // Map Data
     const items = Array.isArray(data) ? data : [data];
-    
+
     if (items.filter(Boolean).length === 0) {
       toast.error("No records to export. Check your search/filter and try again.");
       return;
@@ -120,18 +120,38 @@ export default function MeetingHistory() {
     if (!Array.isArray(data) || items.length === 1) {
       const singleData = items[0];
       const finalY = doc.lastAutoTable.finalY || 55;
-      
+
       doc.setFontSize(14);
       doc.setTextColor(0, 0, 0);
-      doc.text("Meeting Details", 14, finalY + 15);
-      
-      doc.setFontSize(10);
-      doc.text(`Location: ${singleData.meeting_location || "--"}`, 14, finalY + 23);
-      doc.text(`Mode: ${singleData.meeting_mode || "--"}`, 14, finalY + 29);
-      doc.text(`Meeting Number: ${singleData.meeting_number || "--"}`, 14, finalY + 35);
-      doc.text(`Logged On: ${singleData.created_at ? format(new Date(singleData.created_at), "PPpp") : "--"}`, 14, finalY + 41);
-      
-      doc.text("Remarks:", 14, finalY + 51);
+doc.text("Session Details", 14, finalY + 15);
+
+doc.setFontSize(10);
+doc.text(`Access Point: ${singleData.meeting_location || "--"}`, 14, finalY + 23);
+doc.text(`Protocol Mode: ${singleData.meeting_mode || "--"}`, 14, finalY + 29);
+doc.text(
+  `Index Position: PROTOCOL_#${singleData.meeting_number || "--"}`,
+  14,
+  finalY + 35
+);
+doc.text(
+  `Registry Log Time: ${
+    singleData.created_at
+      ? format(new Date(singleData.created_at), "PPpp")
+      : "--"
+  }`,
+  14,
+  finalY + 41
+);
+
+doc.text("Post-Session Observations:", 14, finalY + 51);
+
+doc.setFont(undefined, "italic");
+doc.text(
+  singleData.remarks || "No remarks recorded.",
+  14,
+  finalY + 57,
+  { maxWidth: 180 }
+);
       doc.setFont(undefined, 'italic');
       doc.text(singleData.remarks || "No remarks recorded.", 14, finalY + 57, { maxWidth: 180 });
     }
@@ -249,11 +269,10 @@ export default function MeetingHistory() {
             <button
               key={s}
               onClick={() => setFilterStatus(s)}
-              className={`flex-1 py-3 text-[9px] font-black uppercase tracking-widest transition-all ${
-                filterStatus === s
-                  ? "bg-white shadow-sm text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={`flex-1 py-3 text-[9px] font-black uppercase tracking-widest transition-all ${filterStatus === s
+                ? "bg-white shadow-sm text-primary"
+                : "text-muted-foreground hover:text-foreground"
+                }`}
             >
               {s}
             </button>
@@ -271,74 +290,74 @@ export default function MeetingHistory() {
 
       {/* MEETINGS TABLE */}
       <div className="border border-border bg-card overflow-hidden">
-  <Table>
-    <TableHeader className="bg-accent/5">
-      <TableRow>
-        <TableHead>No</TableHead>
-        <TableHead>RAC Date</TableHead>
-        <TableHead>RAC Comments</TableHead>
-        <TableHead>KP Updated Date</TableHead>
-        <TableHead>Publication Title</TableHead>
-        <TableHead>Journal Details</TableHead>
-        <TableHead className="text-center">Action</TableHead>
-      </TableRow>
-    </TableHeader>
+        <Table>
+          <TableHeader className="bg-accent/5">
+            <TableRow>
+              <TableHead>No</TableHead>
+              <TableHead>RAC Date</TableHead>
+              <TableHead>RAC Comments</TableHead>
+              <TableHead>KP Updated Date</TableHead>
+              <TableHead>Publication Title</TableHead>
+              <TableHead>Journal Details</TableHead>
+              <TableHead className="text-center">Action</TableHead>
+            </TableRow>
+          </TableHeader>
 
-    <TableBody>
-      {loading ? (
-        <TableRow>
-          <TableCell colSpan={7} className="text-center py-10">
-            Loading...
-          </TableCell>
-        </TableRow>
-      ) : filteredMeetings.length === 0 ? (
-        <TableRow>
-          <TableCell colSpan={7} className="text-center py-10">
-            No Records Found
-          </TableCell>
-        </TableRow>
-      ) : (
-        filteredMeetings.map((meeting, index) => (
-          <TableRow key={meeting.id}>
-            <TableCell>{index + 1}</TableCell>
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-10">
+                  Loading...
+                </TableCell>
+              </TableRow>
+            ) : filteredMeetings.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-10">
+                  No Records Found
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredMeetings.map((meeting, index) => (
+                <TableRow key={meeting.id}>
+                  <TableCell>{index + 1}</TableCell>
 
-            <TableCell>
-              {meeting.meeting_date
-                ? format(new Date(meeting.meeting_date), "dd/MM/yyyy")
-                : "--"}
-            </TableCell>
+                  <TableCell>
+                    {meeting.meeting_date
+                      ? format(new Date(meeting.meeting_date), "dd/MM/yyyy")
+                      : "--"}
+                  </TableCell>
 
-            <TableCell>
-              {meeting.rac_comments || "--"}
-            </TableCell>
+                  <TableCell>
+                    {meeting.rac_comments || "--"}
+                  </TableCell>
 
-            <TableCell>
-              {meeting.kp_updated_date || "--"}
-            </TableCell>
+                  <TableCell>
+                    {meeting.kp_upload_date ? format(new Date(meeting.kp_upload_date), "dd/MM/yyyy") : "--"}
+                  </TableCell>
 
-            <TableCell>
-              {meeting.publication_title || "--"}
-            </TableCell>
+                  <TableCell>
+                    {meeting.publication_title || "--"}
+                  </TableCell>
 
-            <TableCell>
-              {meeting.journal_details || "--"}
-            </TableCell>
+                  <TableCell>
+                    {meeting.journal_details || "--"}
+                  </TableCell>
 
-            <TableCell className="text-center">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setSelectedMeeting(meeting)}
-              >
-                View
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))
-      )}
-    </TableBody>
-  </Table>
-</div>
+                  <TableCell className="text-center">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedMeeting(meeting)}
+                    >
+                      View
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
 
       {/* MEETING DETAILS MODAL */}
