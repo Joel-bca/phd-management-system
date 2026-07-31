@@ -88,9 +88,7 @@ export default function Assignment() {
           <h1 className="text-4xl md:text-5xl font-medium tracking-[0.1em] uppercase">
             <span className="text-primary">Faculty Assignment </span>
           </h1>
-          <p className="text-[10px] tracking-[0.3em] uppercase mt-2 text-muted-foreground font-bold">
-            Scholar-Faculty Linking • Encryption: SECURE_CHANNEL
-          </p>
+          
         </div>
         <Button
           onClick={loadData}

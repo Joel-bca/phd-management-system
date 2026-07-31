@@ -2,143 +2,246 @@
 
 import * as React from "react";
 import { NavLink, useLocation } from "react-router-dom";
+
+import {
+  ChevronRight,
+  LogOut,
+} from "lucide-react";
+
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+
 import {
   Sidebar,
   SidebarContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarRail,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
 } from "@/components/ui/sidebar";
+
 import { SIDEBAR_ROUTES } from "@/router/routeConfig";
 import { useAuth } from "@/context/AuthContext";
-import { LogOut, User, Shield } from "lucide-react";
 
 export default function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
+
   const { user, logout } = useAuth();
 
-  // Filters groups based on the logged-in user's role
-  const filteredGroups = SIDEBAR_ROUTES.filter((group) =>
-    group.checkAccess(user),
+  const routes = SIDEBAR_ROUTES.filter((item) =>
+    item.checkAccess(user)
   );
 
+  const isSectionActive = (section: any) =>
+    section.children?.some((child: any) =>
+      location.pathname.startsWith(child.path)
+    );
+
   return (
-    <Sidebar collapsible="icon" {...props} className="border-r-0 shadow-xl">
-      {/* Institutional Branding Header */}
-      <SidebarHeader className="h-16 flex flex-row items-center gap-3 px-4 shrink-0 bg-sidebar/50 backdrop-blur-md border-b">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20 p-1.5 transition-transform duration-300 hover:rotate-12">
-          <img
-            src="/phd-logo.svg"
-            alt="PHD Logo"
-            className="h-full w-full object-contain brightness-0 invert"
-          />
+    <Sidebar
+      collapsible="icon"
+      className="border-r bg-sidebar"
+      {...props}
+    >
+
+      {/* Header */}
+
+      <SidebarHeader className="h-16 border-b px-4 flex items-center">
+
+        <div className="flex items-center gap-3">
+
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
+
+            <img
+              src="/phd-logo.svg"
+              alt="logo"
+              className="h-7 w-7 brightness-0 invert"
+            />
+
+          </div>
+
+          <div className="group-data-[collapsible=icon]:hidden">
+
+            <p className="font-semibold text-sm">
+              PHD Management
+            </p>
+
+            <p className="text-xs text-muted-foreground">
+              Research Portal
+            </p>
+
+          </div>
+
         </div>
-        <div className="flex flex-col truncate group-data-[collapsible=icon]:hidden">
-          <span className="text-sm font-bold leading-none tracking-tight text-foreground">
-            PHD Management
-          </span>
-          <span className="text-[10px] text-primary font-semibold mt-1 uppercase tracking-wider">
-            Research Portal
-          </span>
-        </div>
+
       </SidebarHeader>
 
-      {/* Role-Based Navigation Menu */}
-      <SidebarContent className="py-2 gap-4">
-        {filteredGroups.map((group, groupIdx) => (
-          <SidebarGroup key={`${group.group}-${groupIdx}`}>
-            <SidebarGroupLabel className="px-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2 group-data-[collapsible=icon]:hidden">
-              {group.group}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu className="gap-1 px-2">
-                {group.items.map((item, itemIdx) => {
-                  const isActive = location.pathname === item.path;
-                  const Icon = item.icon;
+      <SidebarContent>
 
-                  return (
-                    <SidebarMenuItem key={`${item.path}-${itemIdx}`}>
-                      <SidebarMenuButton
-                        isActive={isActive}
-                        tooltip={item.title}
-                        className={`
-                          h-11 transition-all duration-200 rounded-lg
-                          ${
-                            isActive
-                              ? "bg-primary/10 text-primary font-semibold shadow-sm"
-                              : "hover:bg-sidebar-accent/50 text-muted-foreground hover:text-foreground"
-                          }
-                        `}
+        <SidebarGroup>
+
+          <SidebarMenu>
+            {/* Dashboard */}
+
+            {routes
+              .filter((item) => !item.children)
+              .map((item) => {
+                const Icon = item.icon;
+                const active = location.pathname === item.path;
+
+                return (
+                  <SidebarMenuItem key={item.path}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={active}
+                      tooltip={item.title}
+                      className="h-11 rounded-lg"
+                    >
+                      <NavLink to={item.path} className="flex items-center gap-3">
+                        <Icon className="h-4 w-4" />
+                        <span className="group-data-[collapsible=icon]:hidden">
+                          {item.title}
+                        </span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+
+            {/* Expandable Sections */}
+
+            {routes
+              .filter((item) => item.children)
+              .map((section) => {
+                const SectionIcon = section.icon;
+
+                return (
+                  <Collapsible
+                    key={section.title}
+                    defaultOpen={
+                      section.defaultOpen || isSectionActive(section)
+                    }
+                  >
+                    <SidebarMenuItem>
+
+                      <CollapsibleTrigger
+                        render={
+                          <SidebarMenuButton
+                            tooltip={section.title}
+                            className="h-11 rounded-lg group/collapsible"
+                          />
+                        }
                       >
-                        <NavLink 
-                          to={item.path} 
-                          className="flex items-center gap-3 w-full h-full"
-                        >
-                          {Icon && (
-                            <Icon
-                              className={`h-[18px] w-[18px] shrink-0 transition-colors ${
-                                isActive ? "text-primary" : "text-muted-foreground"
-                              }`}
-                            />
-                          )}
-                          <span className="text-sm group-data-[collapsible=icon]:hidden">
-                            {item.title}
-                          </span>
-                        </NavLink>
-                      </SidebarMenuButton>
+
+                        <SectionIcon className="h-4 w-4 shrink-0" />
+
+                        <span className="flex-1 text-left group-data-[collapsible=icon]:hidden">
+                          {section.title}
+                        </span>
+
+                        <ChevronRight
+                          className="
+                  h-4
+                  w-4
+                  transition-transform
+                  duration-200
+                  group-data-[panel-open]/collapsible:rotate-90
+                  group-data-[collapsible=icon]:hidden
+                "
+                        />
+
+                      </CollapsibleTrigger>
+
+                      <CollapsibleContent>
+
+                        <SidebarMenu className="mt-1 ml-5 border-l pl-3 gap-1">
+
+                          {section.children.map((child) => {
+                            const ChildIcon = child.icon;
+
+                            const active = location.pathname.startsWith(
+                              child.path
+                            );
+
+                            return (
+                              <SidebarMenuItem key={child.path}>
+
+                                <SidebarMenuButton
+                                  asChild
+                                  isActive={active}
+                                  tooltip={child.title}
+                                  className="h-10 rounded-md"
+                                >
+                                  <NavLink
+                                    to={child.path}
+                                    className="flex items-center gap-3"
+                                  >
+                                    <ChildIcon className="h-4 w-4 shrink-0" />
+
+                                    <span className="group-data-[collapsible=icon]:hidden">
+                                      {child.title}
+                                    </span>
+
+                                  </NavLink>
+
+                                </SidebarMenuButton>
+
+                              </SidebarMenuItem>
+                            );
+                          })}
+
+                        </SidebarMenu>
+
+                      </CollapsibleContent>
+
                     </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+                  </Collapsible>
+                );
+              })}
+
+          </SidebarMenu>
+
+        </SidebarGroup>
+
       </SidebarContent>
 
+      {/* Footer */}
 
-      <SidebarFooter className="p-4 border-t bg-sidebar/30 backdrop-blur-sm">
+      <SidebarFooter className="border-t p-2">
+
         <SidebarMenu>
+
           <SidebarMenuItem>
-            <SidebarMenuButton
-              className={`
-                h-11 transition-all duration-200 rounded-lg mb-1
-                ${location.pathname === "/policy" 
-                  ? "bg-primary/10 text-primary font-semibold shadow-sm" 
-                  : "hover:bg-sidebar-accent/50 text-muted-foreground hover:text-foreground"}
-              `}
-            >
-              <NavLink to="/policy" className="flex items-center gap-3 w-full h-full">
-                <Shield className="h-4 w-4" />
-                <span className="text-sm font-medium group-data-[collapsible=icon]:hidden">
-                  Data Policy
-                </span>
-              </NavLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
+
             <SidebarMenuButton
               onClick={logout}
-              className="h-11 w-full justify-start gap-3 rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive transition-colors"
+              tooltip="Logout"
+              className="h-11 rounded-lg text-red-500 hover:text-red-600 hover:bg-red-50"
             >
               <LogOut className="h-4 w-4" />
-              <span className="text-sm font-medium group-data-[collapsible=icon]:hidden">
+
+              <span className="group-data-[collapsible=icon]:hidden">
                 Logout
               </span>
+
             </SidebarMenuButton>
+
           </SidebarMenuItem>
+
         </SidebarMenu>
+
       </SidebarFooter>
 
       <SidebarRail />
+
     </Sidebar>
   );
 }
-

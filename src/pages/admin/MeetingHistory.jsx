@@ -116,24 +116,44 @@ export default function MeetingHistory() {
       alternateRowStyles: { fillColor: [249, 250, 251] },
     });
 
-    // If single protocol, print detailed info
+    // If single meeting, print detailed info
     if (!Array.isArray(data) || items.length === 1) {
       const singleData = items[0];
       const finalY = doc.lastAutoTable.finalY || 55;
 
       doc.setFontSize(14);
       doc.setTextColor(0, 0, 0);
-      doc.text("Session Details", 14, finalY + 15);
+doc.text("Session Details", 14, finalY + 15);
 
-      doc.setFontSize(10);
-      doc.text(`Access Point: ${singleData.meeting_location || "--"}`, 14, finalY + 23);
-      doc.text(`Protocol Mode: ${singleData.meeting_mode || "--"}`, 14, finalY + 29);
-      doc.text(`Index Position: PROTOCOL_#${singleData.meeting_number || "--"}`, 14, finalY + 35);
-      doc.text(`Registry Log Time: ${singleData.created_at ? format(new Date(singleData.created_at), "PPpp") : "--"}`, 14, finalY + 41);
+doc.setFontSize(10);
+doc.text(`Access Point: ${singleData.meeting_location || "--"}`, 14, finalY + 23);
+doc.text(`Protocol Mode: ${singleData.meeting_mode || "--"}`, 14, finalY + 29);
+doc.text(
+  `Index Position: PROTOCOL_#${singleData.meeting_number || "--"}`,
+  14,
+  finalY + 35
+);
+doc.text(
+  `Registry Log Time: ${
+    singleData.created_at
+      ? format(new Date(singleData.created_at), "PPpp")
+      : "--"
+  }`,
+  14,
+  finalY + 41
+);
 
-      doc.text("Post-Session Observations:", 14, finalY + 51);
+doc.text("Post-Session Observations:", 14, finalY + 51);
+
+doc.setFont(undefined, "italic");
+doc.text(
+  singleData.remarks || "No remarks recorded.",
+  14,
+  finalY + 57,
+  { maxWidth: 180 }
+);
       doc.setFont(undefined, 'italic');
-      doc.text(singleData.remarks || "No observations recorded.", 14, finalY + 57, { maxWidth: 180 });
+      doc.text(singleData.remarks || "No remarks recorded.", 14, finalY + 57, { maxWidth: 180 });
     }
 
     doc.save(`${filename}_${format(new Date(), "yyyyMMdd")}.pdf`);
@@ -147,7 +167,7 @@ export default function MeetingHistory() {
         setMeetings(res.data);
       }
     } catch (err) {
-      toast.error("LOG_SYNC_FAILED: " + err.message);
+      toast.error("Failed to load meeting history: " + err.message);
     }
     setLoading(false);
   };
@@ -177,7 +197,7 @@ export default function MeetingHistory() {
     if (m.Status_deletion === false) {
       return (
         <span className="flex items-center gap-1.5 px-2.5 py-1 bg-red-50 text-red-600 border border-red-200 text-[10px] font-black uppercase tracking-widest">
-          <Trash2 className="h-3 w-3" /> Purged
+          <Trash2 className="h-3 w-3" /> Deleted
         </span>
       );
     }
@@ -186,7 +206,7 @@ export default function MeetingHistory() {
       case "completed":
         return (
           <span className="flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-600 border border-green-200 text-[10px] font-black uppercase tracking-widest">
-            <CheckCircle className="h-3 w-3" /> Conducted
+            <CheckCircle className="h-3 w-3" /> Completed
           </span>
         );
       case "cancelled":
@@ -212,11 +232,11 @@ export default function MeetingHistory() {
           <div>
             <h1 className="text-4xl font-medium tracking-[0.1em] uppercase">
               <span className="text-primary">
-                rac <span>History</span>
+                RAC <span>History</span>
               </span>
             </h1>
             <p className="text-[10px] tracking-[0.3em] uppercase mt-2 text-muted-foreground font-bold">
-              Registry: rac_ADVISORY_LOGS • Audit Mode
+              Research Advisory Committee • Meeting Records
             </p>
           </div>
           <Button
@@ -226,7 +246,7 @@ export default function MeetingHistory() {
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             <span className="text-[10px] font-black tracking-widest uppercase">
-              Sync Registry
+              Refresh
             </span>
           </Button>
         </div>
@@ -237,7 +257,7 @@ export default function MeetingHistory() {
         <div className="relative group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <Input
-            placeholder="Search by Student name or Supervisor name"
+            placeholder="Search by student or supervisor name"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-12 h-14 bg-accent/5 border-border focus:border-primary rounded-none text-[10px] tracking-widest font-bold uppercase transition-all"
@@ -261,14 +281,14 @@ export default function MeetingHistory() {
 
         <Button
           disabled={loading}
-          onClick={() => exportToPDF(filteredMeetings, "rac_Audit_Logs")}
+          onClick={() => exportToPDF(filteredMeetings, "RAC_History")}
           className="h-14 rounded-none bg-primary hover:bg-primary/90 text-white uppercase text-[10px] tracking-widest font-black gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
         >
-          <Download className="h-4 w-4" /> Export_Audit_Logs
+          <Download className="h-4 w-4" /> Export Records
         </Button>
       </div>
 
-      {/* REGISTRY TABLE */}
+      {/* MEETINGS TABLE */}
       <div className="border border-border bg-card overflow-hidden">
         <Table>
           <TableHeader className="bg-accent/5">
@@ -340,7 +360,7 @@ export default function MeetingHistory() {
       </div>
 
 
-      {/* SESSION DETAILS MODAL */}
+      {/* MEETING DETAILS MODAL */}
       <Dialog
         open={!!selectedMeeting}
         onOpenChange={() => setSelectedMeeting(null)}
@@ -349,12 +369,9 @@ export default function MeetingHistory() {
           <DialogHeader className="p-8 bg-accent/5 border-b border-border">
             <div className="flex justify-between items-start pr-12">
               <div>
-                <DialogTitle className="text-2xl font-medium uppercase tracking-tight">
-                  Protocol <span className="text-primary">Details</span>
+                <DialogTitle className="text-2xl font-medium uppercase tracking-tight text-blue-500">
+                  Meeting Details
                 </DialogTitle>
-                <DialogDescription className="text-[10px] tracking-[0.2em] uppercase font-bold text-muted-foreground mt-1">
-                  Nexus_Identifier: {selectedMeeting?.id}
-                </DialogDescription>
               </div>
               {selectedMeeting && getStatusBadge(selectedMeeting)}
             </div>
@@ -365,11 +382,11 @@ export default function MeetingHistory() {
             <div className="space-y-3">
               <label className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground font-black flex items-center gap-2">
                 <FileText className="h-3 w-3 text-primary" />{" "}
-                Advisory_Focus_Subject
+                Meeting Subject
               </label>
               <div className="p-4 bg-accent/5 border border-border">
                 <p className="text-sm font-bold uppercase text-foreground leading-relaxed">
-                  {selectedMeeting?.meeting_subject || "NULL_SUBJECT"}
+                  {selectedMeeting?.meeting_subject || "No subject provided"}
                 </p>
               </div>
             </div>
@@ -378,31 +395,31 @@ export default function MeetingHistory() {
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-3">
                 <label className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground font-black flex items-center gap-2">
-                  <MapPin className="h-3 w-3 text-primary" /> Access_Point
+                  <MapPin className="h-3 w-3 text-primary" /> Location
                 </label>
                 <p className="text-[11px] font-bold uppercase text-foreground">
-                  {selectedMeeting?.meeting_location || "AWAITING_COORDINATES"}
+                  {selectedMeeting?.meeting_location || "Not specified"}
                 </p>
               </div>
               <div className="space-y-3">
                 <label className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground font-black flex items-center gap-2">
-                  <Video className="h-3 w-3 text-primary" /> Protocol_Mode
+                  <Video className="h-3 w-3 text-primary" /> Mode
                 </label>
                 <p className="text-[11px] font-bold uppercase text-foreground">
-                  {selectedMeeting?.meeting_mode}
+                  {selectedMeeting?.meeting_mode || "Not specified"}
                 </p>
               </div>
               <div className="space-y-3">
                 <label className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground font-black flex items-center gap-2">
-                  <Layers className="h-3 w-3 text-primary" /> Index_Position
+                  <Layers className="h-3 w-3 text-primary" /> Meeting Number
                 </label>
                 <p className="text-[11px] font-bold uppercase text-foreground">
-                  PROTOCOL_#{selectedMeeting?.meeting_number}
+                  {selectedMeeting?.meeting_number || "--"}
                 </p>
               </div>
               <div className="space-y-3">
                 <label className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground font-black flex items-center gap-2">
-                  <Clock className="h-3 w-3 text-primary" /> Registry_Log_Time
+                  <Clock className="h-3 w-3 text-primary" /> Logged On
                 </label>
                 <p className="text-[11px] font-bold uppercase text-foreground">
                   {selectedMeeting &&
@@ -416,7 +433,7 @@ export default function MeetingHistory() {
               <div className="space-y-3">
                 <label className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground font-black flex items-center gap-2">
                   <MessageSquare className="h-3 w-3 text-primary" />{" "}
-                  Post_Session_Observations
+                  Remarks
                 </label>
                 <div className="p-5 bg-primary/5 border-l-2 border-primary/30">
                   <p className="text-[11px] text-foreground/80 leading-relaxed font-medium italic">
@@ -435,30 +452,27 @@ export default function MeetingHistory() {
                 selectedMeeting &&
                 exportToPDF(
                   selectedMeeting,
-                  `Protocol_${selectedMeeting.meeting_number}`,
+                  `Meeting_${selectedMeeting.meeting_number}`,
                 )
               }
               className="rounded-none border-border hover:bg-white uppercase text-[10px] tracking-widest font-black flex-1 h-12 gap-3"
             >
-              <Download className="h-4 w-4" /> Export_Single_Protocol
+              <Download className="h-4 w-4" /> Export PDF
             </Button>
             <Button
               onClick={() => setSelectedMeeting(null)}
               className="rounded-none bg-foreground hover:bg-foreground/90 text-white uppercase text-[10px] tracking-widest font-black flex-1 h-12"
             >
-              Close_Terminal
+              Close
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* AUDIT FOOTER */}
-      <footer className="mt-8 flex justify-between items-center text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">
+      {/* FOOTER */}
+      <footer className="mt-8 flex justify-end items-center text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">
         <p>
-          Registry_Identifier: {crypto.randomUUID().split("-")[0].toUpperCase()}
-        </p>
-        <p>
-          Total_Entries: {filteredMeetings.length} / {meetings.length}
+          Showing {filteredMeetings.length} of {meetings.length} records
         </p>
       </footer>
     </div>

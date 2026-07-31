@@ -82,10 +82,7 @@ export default function AdminDashboard() {
               Administrative <span className="text-primary">Portal</span>
             </span>
           </h1>
-          <p className="text-[10px] tracking-[0.3em] uppercase mt-2 text-muted-foreground font-bold">
-            Node: {manifest.version_code} • Protocol:{" "}
-            {loading ? "Syncing..." : "Active"}
-          </p>
+          
         </div>
         <Button
           onClick={fetchData}
