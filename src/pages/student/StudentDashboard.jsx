@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 import MeetingDetailsModal from "../../components/MeetingDetailsModal";
+import MeetingMinutesModal from "../../components/MeetingMinutesModal";
 
 // --- MAIN COMPONENT ---
 export default function StudentDashboard() {
@@ -34,6 +35,7 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
+  const [minutesMeetingId, setMinutesMeetingId] = useState(null);
   const [tempContact, setTempContact] = useState({
     personal_email: "",
     mobile: "",
@@ -102,6 +104,12 @@ export default function StudentDashboard() {
   const upcomingMeeting = meetings
     .filter((m) => m.status === "pending")
     .sort((a, b) => new Date(a.meeting_date) - new Date(b.meeting_date))[0];
+
+  // The most recent meeting whose date has already passed — the one
+  // the student can/should fill minutes for
+  const pastMeeting = meetings
+    .filter((m) => m.meeting_date && new Date(m.meeting_date) <= new Date())
+    .sort((a, b) => new Date(b.meeting_date) - new Date(a.meeting_date))[0];
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8 font-sans">
@@ -392,6 +400,26 @@ export default function StudentDashboard() {
               </Button>
             </div>
           )}
+
+          {pastMeeting && (
+            <div className="mt-6 p-6 bg-accent/5 border border-border border-dashed flex flex-col md:flex-row items-center justify-between gap-6">
+              <div>
+                <h4 className="text-sm font-bold uppercase tracking-widest">
+                  Meeting #{pastMeeting.meeting_number} Minutes
+                </h4>
+                <p className="text-[10px] uppercase text-muted-foreground tracking-tight mt-1">
+                  {new Date(pastMeeting.meeting_date).toLocaleDateString()} —
+                  record what was discussed and decided
+                </p>
+              </div>
+              <Button
+                onClick={() => setMinutesMeetingId(pastMeeting.id)}
+                className="rounded-none h-11 px-8 bg-primary hover:bg-primary/90 text-white uppercase text-[10px] tracking-widest font-bold"
+              >
+                Fill Meeting Minutes
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -399,6 +427,13 @@ export default function StudentDashboard() {
       <MeetingDetailsModal
         meeting={selectedMeeting}
         onClose={() => setSelectedMeeting(null)}
+      />
+
+      {/* MINUTES MODAL */}
+      <MeetingMinutesModal
+        meetingId={minutesMeetingId}
+        onClose={() => setMinutesMeetingId(null)}
+        onUpdated={loadData}
       />
     </div>
   );

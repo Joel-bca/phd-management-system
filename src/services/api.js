@@ -93,6 +93,27 @@ export const studentService = {
 
   // Fetches rac (Research Advisory Health) meetings for the logged-in student
   getracMeetings: () => apiFetch("/student/meetings"),
+
+  // --- RAC Meeting Minutes / Progress Review ---
+
+  // Fetches a single meeting pre-filled with scholar/supervisor/RAC member
+  // info plus any existing draft/submitted minutes
+  getMeetingMinutes: (meetingId) =>
+    apiFetch(`/student/meetings/${meetingId}/minutes`),
+
+  // Saves (creates or updates) the student's draft — only allowed while
+  // status is still 'draft' on the backend
+  saveMinutesDraft: (meetingId, data) =>
+    apiFetch(`/student/meetings/${meetingId}/minutes`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+
+  // Locks the draft in as submitted, moving it into the supervisor's queue
+  submitMinutes: (meetingId) =>
+    apiFetch(`/student/meetings/${meetingId}/minutes/submit`, {
+      method: "POST",
+    }),
 };
 
 export const supervisorService = {
