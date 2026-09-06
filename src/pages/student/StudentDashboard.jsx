@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 import MeetingDetailsModal from "../../components/MeetingDetailsModal";
-import MeetingMinutesModal from "../../components/MeetingMinutesModal";
+import MeetingMinutesModal from "../../components/Meetingminutesmodal";
 
 // --- MAIN COMPONENT ---
 export default function StudentDashboard() {

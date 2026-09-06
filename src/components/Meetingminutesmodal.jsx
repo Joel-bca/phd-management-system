@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { studentService } from "../../services/api";
+import { studentService } from "../services/api";
 import { X, Save, Send, Loader2, FileText, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
