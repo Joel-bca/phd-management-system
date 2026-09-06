@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 import MeetingDetailsModal from "../../components/MeetingDetailsModal";
-import MeetingMinutesModal from "../../components/MeetingMinutesModal";
+import MeetingMinutesModal from "../../components/student/Meetingminutesmodal";
 import RacMinutesSection from "../../components/student/RacMinutesSection";
 
 // --- MAIN COMPONENT ---
