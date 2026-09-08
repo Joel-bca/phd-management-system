@@ -113,15 +113,29 @@ const drawTextBox = (doc, y, label, content, boxHeight = 30) => {
   return y + boxHeight + 12;
 };
 
-// A blank signature line with a printed label underneath — no digital
-// signature capture, this is purely for physical sign-off after printing.
-const drawSignatureLine = (doc, y, label) => {
+// A row of signature cells rendered as a bordered table — each cell has
+// blank space at the top to physically sign, with the label bottom-aligned.
+// Pass 1 label for a single full-width box, or multiple for side-by-side.
+const drawSignatureRow = (doc, y, labels) => {
   const margin = 14;
-  doc.setLineWidth(0.2);
-  doc.line(margin, y, margin + 75, y);
-  doc.setFontSize(8);
-  doc.text(label, margin, y + 5);
-  return y + 16;
+
+  autoTable(doc, {
+    startY: y,
+    theme: "grid",
+    margin: { left: margin, right: margin },
+    styles: {
+      fontSize: 8,
+      minCellHeight: 22,
+      valign: "bottom",
+      halign: "left",
+      cellPadding: { bottom: 2, left: 3, top: 2, right: 3 },
+      lineColor: [0, 0, 0],
+      lineWidth: 0.2,
+    },
+    body: [labels],
+  });
+
+  return doc.lastAutoTable.finalY + 8;
 };
 
 /**
@@ -182,9 +196,7 @@ export const exportRacDocuments = async (meetingData, logoUrl) => {
   doc.text("Signature of the Supervisor and RAC Members", 14, y);
   doc.setFont(undefined, "normal");
   y += 10;
-  y = drawSignatureLine(doc, y, "Supervisor");
-  y = drawSignatureLine(doc, y, "RAC Member 1");
-  y = drawSignatureLine(doc, y, "RAC Member 2");
+  y = drawSignatureRow(doc, y, ["Supervisor", "RAC Member 1", "RAC Member 2"]);
 
   // ---- PAGE 2: Progress Review ----
   doc.addPage();
@@ -199,15 +211,15 @@ export const exportRacDocuments = async (meetingData, logoUrl) => {
   // rac_comments field is used where available; RAC member boxes print
   // blank for now, exactly like the original paper form.
   y = drawTextBox(doc, y, "Supervisor's Comments:", meetingData.rac_comments);
-  y = drawSignatureLine(doc, y, "Supervisor Signature");
+  y = drawSignatureRow(doc, y, ["Supervisor Signature"]);
 
   y += 4;
   y = drawTextBox(doc, y, "RAC Member's Comments:", null);
-  y = drawSignatureLine(doc, y, `${racMember1 || "RAC Member 1"} Signature`);
+  y = drawSignatureRow(doc, y, [`${racMember1 || "RAC Member 1"} Signature`]);
 
   y += 4;
   y = drawTextBox(doc, y, "RAC Member's Comments:", null);
-  y = drawSignatureLine(doc, y, `${racMember2 || "RAC Member 2"} Signature`);
+  y = drawSignatureRow(doc, y, [`${racMember2 || "RAC Member 2"} Signature`]);
 
   const fileName = `RAC_Meeting_${meetingData.meeting_number}_${
     scholarName || "Scholar"
