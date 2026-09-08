@@ -19,6 +19,26 @@ const loadImageAsDataUrl = (url) =>
     img.src = url;
   });
 
+const PAGE_BOTTOM_MARGIN = 20;
+const PAGE_TOP_MARGIN = 20;
+
+// Checks whether `needed` mm of vertical space remains before the bottom
+// margin. If not, starts a new page (with a small continuation header)
+// and returns the new y to draw from — this is what stops content from
+// silently running off the bottom of the page.
+const ensureSpace = (doc, y, needed) => {
+  const pageHeight = doc.internal.pageSize.getHeight();
+  if (y + needed > pageHeight - PAGE_BOTTOM_MARGIN) {
+    doc.addPage();
+    doc.setFontSize(8);
+    doc.setFont(undefined, "italic");
+    doc.text("(continued)", 14, 12);
+    doc.setFont(undefined, "normal");
+    return PAGE_TOP_MARGIN;
+  }
+  return y;
+};
+
 // Logo + form title block shared by both pages.
 // titleLines: array of 1-2 strings, e.g. ["MINUTES OF MEETING", "RESEARCH ADVISORY COMMITTEE MEETING"]
 const drawHeader = (doc, logoDataUrl, titleLines) => {
@@ -93,6 +113,7 @@ const drawInfoTable = (doc, startY, info) => {
 // A labeled bordered box for free-text content (Members Present,
 // Points Discussed, Supervisor's Comments, etc.)
 const drawTextBox = (doc, y, label, content, boxHeight = 30) => {
+  y = ensureSpace(doc, y, boxHeight + 16); // label + box + trailing gap
   const margin = 14;
   const pageWidth = doc.internal.pageSize.getWidth();
   const boxWidth = pageWidth - margin * 2;
@@ -117,6 +138,7 @@ const drawTextBox = (doc, y, label, content, boxHeight = 30) => {
 // blank space at the top to physically sign, with the label bottom-aligned.
 // Pass 1 label for a single full-width box, or multiple for side-by-side.
 const drawSignatureRow = (doc, y, labels) => {
+  y = ensureSpace(doc, y, 22 + 12); // cell height + trailing gap
   const margin = 14;
 
   autoTable(doc, {
@@ -191,6 +213,7 @@ export const exportRacDocuments = async (meetingData, logoUrl) => {
   y = drawTextBox(doc, y, "Points Discussed", minutes?.points_discussed);
   y = drawTextBox(doc, y, "Decisions Reached", minutes?.decisions_reached);
 
+  y = ensureSpace(doc, y, 30); // caption + table won't get orphaned apart
   doc.setFontSize(9);
   doc.setFont(undefined, "bold");
   doc.text("Signature of the Supervisor and RAC Members", 14, y);
