@@ -30,9 +30,10 @@ const ensureSpace = (doc, y, needed) => {
   const pageHeight = doc.internal.pageSize.getHeight();
   if (y + needed > pageHeight - PAGE_BOTTOM_MARGIN) {
     doc.addPage();
+    const pageWidth = doc.internal.pageSize.getWidth();
     doc.setFontSize(8);
     doc.setFont(undefined, "italic");
-    doc.text("(continued)", 14, 12);
+    doc.text("(continued)", pageWidth - 14, 12, { align: "right" });
     doc.setFont(undefined, "normal");
     return PAGE_TOP_MARGIN;
   }
@@ -111,22 +112,31 @@ const drawInfoTable = (doc, startY, info) => {
 };
 
 // A labeled bordered box for free-text content (Members Present,
-// Points Discussed, Supervisor's Comments, etc.)
-const drawTextBox = (doc, y, label, content, boxHeight = 30) => {
-  y = ensureSpace(doc, y, boxHeight + 16); // label + box + trailing gap
+// Points Discussed, Supervisor's Comments, etc.). Sizes itself to the
+// actual content (with a sensible minimum) instead of a fixed height —
+// short answers stay compact, long answers grow and page-break naturally.
+const BOX_MIN_HEIGHT = 20;
+const LINE_HEIGHT = 4.6; // mm per line at 9pt
+
+const drawTextBox = (doc, y, label, content, minHeight = BOX_MIN_HEIGHT) => {
   const margin = 14;
   const pageWidth = doc.internal.pageSize.getWidth();
   const boxWidth = pageWidth - margin * 2;
 
   doc.setFontSize(9);
+  const lines = content ? doc.splitTextToSize(content, boxWidth - 8) : [];
+  const contentHeight = lines.length ? lines.length * LINE_HEIGHT + 6 : 0;
+  const boxHeight = Math.max(minHeight, contentHeight);
+
+  y = ensureSpace(doc, y, boxHeight + 16); // label + box + trailing gap
+
   doc.setFont(undefined, "bold");
   doc.text(label, margin, y);
   doc.setFont(undefined, "normal");
 
   doc.rect(margin, y + 3, boxWidth, boxHeight);
 
-  if (content) {
-    const lines = doc.splitTextToSize(content, boxWidth - 8);
+  if (lines.length) {
     doc.setFontSize(9);
     doc.text(lines, margin + 4, y + 10);
   }

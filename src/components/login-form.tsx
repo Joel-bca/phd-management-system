@@ -42,11 +42,16 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // 🔥 ADDED
   const navigate = useNavigate();
   const { login } = useAuth(); // 🔥 ADDED
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isLoading) return; // 🔥 ADDED: guard against double-submits (e.g. double-click, Enter + click)
+
+    setIsLoading(true); // 🔥 ADDED
 
     try {
       const res = await fetch("/api/auth/login", {
@@ -88,6 +93,8 @@ export function LoginForm({
       else if (authData.role === "student") navigate("/student/dashboard");
     } catch (err: any) {
       alert(err.message);
+    } finally {
+      setIsLoading(false); // 🔥 ADDED: re-enable on both success and failure
     }
   };
 
@@ -131,8 +138,8 @@ export function LoginForm({
                 />
               </Field>
               <Field>
-                <Button type="submit" className="w-full">
-                  Login
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Logging in..." : "Login"}
                 </Button>
               </Field>
               <FieldDescription className="text-center">
