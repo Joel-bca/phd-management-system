@@ -32,6 +32,10 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
+// 🔥 ADDED: pull in context + the shared localStorage writer
+import { useAuth } from "@/context/AuthContext"; // <-- adjust path to wherever AuthContext.jsx actually lives
+import { setAuth } from "@/lib/auth"; // <-- adjust path to wherever auth.js actually lives
+
 export function LoginForm({
   className,
   ...props
@@ -39,19 +43,19 @@ export function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth(); // 🔥 ADDED
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       const res = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({ email, password }),
+      });
 
       const data = await res.json();
 
@@ -59,21 +63,29 @@ export function LoginForm({
         throw new Error(data.error || "Login failed");
       }
 
-      // ✅ Store auth
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
-      localStorage.setItem("name", data.name);
-      localStorage.setItem("id", data.id);
-      localStorage.setItem("is_hod", data.is_hod ? "true" : "false");
-      localStorage.setItem(
-        "is_coordinator",
-        data.is_coordinator ? "true" : "false",
-      );
+      // Build one consistent user object from the API response
+      const authData = {
+        token: data.token,
+        role: data.role,
+        name: data.name,
+        id: data.id,
+        is_hod: !!data.is_hod,
+        is_coordinator: !!data.is_coordinator,
+      };
+
+      // ✅ Persist to localStorage (single place this happens now)
+      setAuth(authData);
+
+      // ✅ THE ACTUAL FIX: sync React context immediately, in the same tick.
+      // Without this, AuthContext.user stays null until a full page reload
+      // re-reads localStorage — which is exactly the "have to reload and
+      // try again" bug.
+      login(authData);
 
       // 🔥 Role-based redirect (Priority to HOD if they have the flag)
-      if (data.is_hod || data.role === "hod") navigate("/admin/dashboard");
-      else if (data.role === "supervisor") navigate("/supervisor/dashboard");
-      else if (data.role === "student") navigate("/student/dashboard");
+      if (authData.is_hod || authData.role === "hod") navigate("/admin/dashboard");
+      else if (authData.role === "supervisor") navigate("/supervisor/dashboard");
+      else if (authData.role === "student") navigate("/student/dashboard");
     } catch (err: any) {
       alert(err.message);
     }
@@ -91,7 +103,6 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* 🔥 CONNECTED FORM */}
           <form onSubmit={handleLogin}>
             <FieldGroup>
               <Field>
@@ -126,9 +137,8 @@ export function LoginForm({
               </Field>
               <FieldDescription className="text-center">
                 Protected by university-grade encryption. Need an account?
-                Contact {/* Change Dialog to AlertDialog */}
+                Contact{" "}
                 <AlertDialog>
-                  {/* Change DialogTrigger to AlertDialogTrigger */}
                   <AlertDialogTrigger className="underline hover:text-primary cursor-pointer">
                     Faculty Admin
                   </AlertDialogTrigger>
@@ -164,7 +174,7 @@ export function LoginForm({
         </div>
 
         <a
-          href="https://your-university.edu/academic-policy" // Replace with your actual link
+          href="https://your-university.edu/academic-policy"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors decoration-none"
